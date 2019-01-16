@@ -1,5 +1,7 @@
-#define MICROPY_HW_BOARD_NAME "Arduino Zero"
+#define MICROPY_HW_BOARD_NAME "KOOV Core"
 #define MICROPY_HW_MCU_NAME "samd21g18"
+
+#define MICROPY_PY_FRAMEBUF   (0)
 
 // #define MICROPY_HW_LED_MSC  PIN_PA17 // red
 #define MICROPY_HW_LED_TX   PIN_PA27
@@ -9,11 +11,15 @@
 #define MICROPY_PORT_B        (PORT_PB03)
 #define MICROPY_PORT_C        (0)
 
+#define TOTAL_INTERNAL_FLASH_SIZE 0x009000
+
 #include "internal_flash.h"
 
 #define CIRCUITPY_INTERNAL_NVM_SIZE 0
 
-#define BOARD_FLASH_SIZE (0x00040000 - 0x2000 - 0x010000)
+#define BOARD_FLASH_SIZE (0x00040000 - 0x2000 - TOTAL_INTERNAL_FLASH_SIZE)
+#define OOFATFS_N_ROOTDIR 32
+#define EXTRA_BUILTIN_MODULES
 
 #define DEFAULT_I2C_BUS_SCL (&pin_PA23)
 #define DEFAULT_I2C_BUS_SDA (&pin_PA22)
