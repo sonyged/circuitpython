@@ -28,10 +28,20 @@
 
 #include "reset.h"
 #include "supervisor/filesystem.h"
+#ifdef RESET_WITH_WDT
+#include "hri/hri_wdt_d21.h"
+#endif
 
 void reset(void) {
     filesystem_flush();
+#ifndef RESET_WITH_WDT
     NVIC_SystemReset();
+#else
+    hri_wdt_write_CONFIG_PER_bf(WDT, 0);
+    hri_wdt_set_CTRL_ENABLE_bit(WDT);
+    for(;;)
+        ;
+#endif
 }
 
 void reset_to_bootloader(void) {

@@ -139,6 +139,10 @@ ifdef NO_TOUCHIO
 CFLAGS += \
 	-DNO_TOUCHIO
 endif
+ifdef RESET_WITH_WDT
+CFLAGS += \
+	-DRESET_WITH_WDT
+endif
 ifeq ($(CHIP_FAMILY), samd51)
 CFLAGS += \
 	-mthumb \
