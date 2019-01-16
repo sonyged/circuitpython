@@ -249,7 +249,9 @@ void reset_port(void) {
     //pdmin_reset();
 #endif
 #ifdef SAMD21
+#ifndef NO_TOUCHIO
     touchin_reset();
+#endif
 #endif
     eic_reset();
     pulseout_reset();

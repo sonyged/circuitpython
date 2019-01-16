@@ -135,6 +135,10 @@ CFLAGS += \
 	-mfloat-abi=soft \
 	-DSAMD21
 endif
+ifdef NO_TOUCHIO
+CFLAGS += \
+	-DNO_TOUCHIO
+endif
 ifeq ($(CHIP_FAMILY), samd51)
 CFLAGS += \
 	-mthumb \
@@ -336,9 +340,15 @@ SRC_COMMON_HAL = \
 	usb_hid/__init__.c \
 	usb_hid/Device.c \
 	audioio/__init__.c \
-	audioio/AudioOut.c \
+	audioio/AudioOut.c
+
+ifndef NO_TOUCHIO
+SRC_COMMON_HAL += \
 	touchio/__init__.c \
 	touchio/TouchIn.c \
+
+endif
+
 
 ifeq ($(INTERNAL_LIBM),1)
 SRC_LIBM = $(addprefix lib/,\

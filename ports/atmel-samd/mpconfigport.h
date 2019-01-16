@@ -243,7 +243,11 @@ extern const struct _mp_obj_module_t usb_hid_module;
 //    { MP_OBJ_NEW_QSTR(MP_QSTR__stage), (mp_obj_t)&stage_module },
 
 #ifdef SAMD21
+#ifndef NO_TOUCHIO
 #define TOUCHIO_MODULE { MP_OBJ_NEW_QSTR(MP_QSTR_touchio), (mp_obj_t)&touchio_module },
+#else
+#define TOUCHIO_MODULE
+#endif
 #endif
 #ifdef SAMD51
 #define TOUCHIO_MODULE
