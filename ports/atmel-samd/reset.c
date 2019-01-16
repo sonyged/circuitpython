@@ -39,7 +39,7 @@ void reset(void) {
 #else
     hri_wdt_write_CONFIG_PER_bf(WDT, 0);
     hri_wdt_set_CTRL_ENABLE_bit(WDT);
-    for(;;)
+    for (;;)
         ;
 #endif
 }
