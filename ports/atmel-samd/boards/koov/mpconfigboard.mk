@@ -13,3 +13,6 @@ CHIP_FAMILY = samd21
 BOOTLOADER_SIZE = 0x4000
 NO_TOUCHIO = 1
 RESET_WITH_WDT = 1
+
+FROZEN_MPY_DIRS += $(TOP)/frozen/Adafruit_CircuitPython_BusDevice
+FROZEN_MPY_DIRS += $(TOP)/frozen/Adafruit_CircuitPython_MMA8451
