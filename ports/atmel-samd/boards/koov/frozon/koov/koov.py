@@ -116,8 +116,6 @@ class dcmotor:
     self._control()
 
 class servomotor:
-  SERVO_POSITION = {}
-
   @staticmethod
   def synchronized_motion(speed, servos):
     speed = max(0, min(100, speed)) / 5
@@ -129,10 +127,9 @@ class servomotor:
         self._curpos = {}
         self._deltas = {}
         for (servo, degree) in servos:
-          with servo.port as port:
-            self._curpos[port] = servo.degree
-            self._deltas[port] = delta = degree - self._curpos[port]
-            self._max_delta = max(self._max_delta, math.fabs(delta))
+          self._curpos[servo.port] = servo.degree
+          self._deltas[servo.port] = delta = degree - self._curpos[servo.port]
+          self._max_delta = max(self._max_delta, math.fabs(delta))
       @property
       def delta(self):
         return self._max_delta
@@ -166,10 +163,9 @@ class servomotor:
     degree = max(0, min(180, degree))
     ratio = degree / 180
     self._degree = degree
-    with self._device as pwm:
-      min_duty = (500 * pwm.frequency) / 1000000 * 0xffff
-      max_duty = (2500 * pwm.frequency) / 1000000 * 0xffff
-      pwm.duty_cycle = int(min_duty + (max_duty - min_duty) * ratio)
+    min_duty = (500 * self._device.frequency) / 1000000 * 0xffff
+    max_duty = (2500 * self._device.frequency) / 1000000 * 0xffff
+    self._device.duty_cycle = int(min_duty + (max_duty - min_duty) * ratio)
 
   @property
   def degree(self):
