@@ -73,3 +73,7 @@
 [submodule "frozen/Adafruit_CircuitPython_Crickit"]
 	path = frozen/Adafruit_CircuitPython_Crickit
 	url = https://github.com/adafruit/Adafruit_CircuitPython_Crickit
+[submodule "frozen/Adafruit_CircuitPython_MMA8451"]
+	path = frozen/Adafruit_CircuitPython_MMA8451
+	url = https://github.com/sonyged/Adafruit_CircuitPython_MMA8451.git
+	branch = koov
