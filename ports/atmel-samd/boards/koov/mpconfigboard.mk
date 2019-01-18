@@ -16,3 +16,4 @@ RESET_WITH_WDT = 1
 
 FROZEN_MPY_DIRS += $(TOP)/frozen/Adafruit_CircuitPython_BusDevice
 FROZEN_MPY_DIRS += $(TOP)/frozen/Adafruit_CircuitPython_MMA8451
+FROZEN_MPY_DIRS += $(TOP)/ports/atmel-samd/boards/koov/frozon/koov
