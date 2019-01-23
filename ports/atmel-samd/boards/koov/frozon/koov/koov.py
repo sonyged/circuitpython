@@ -77,7 +77,7 @@ class buzzer:
   def off(self):
     self._device.frequency = 20000
 
-class dcmotor:
+class dc_motor:
   def __init__(self, port):
     if port == board.V0:
       self._apin = pulseio.PWMOut(board.D2)
@@ -115,7 +115,7 @@ class dcmotor:
     self._mode = mode
     self._control()
 
-class servomotor:
+class servo_motor:
   @staticmethod
   def synchronized_motion(speed, servos):
     speed = max(0, min(100, speed)) / 5
@@ -184,10 +184,6 @@ class digital_sensor:
   @property
   def value(self):
     return self._device.value
-  def ison(self):
-    return self._device.value == 0
-  def isoff(self):
-    return self._device.value != 0
 
 class push_button(digital_sensor):
   def __init__(self, port):
