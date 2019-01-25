@@ -122,25 +122,46 @@ class servo_motor:
     delay = 20 - max(0, min(20, speed))
     class deltas:
       def __init__(self, servos):
-        self._servos = servos
         self._max_delta = 0
         self._curpos = {}
         self._deltas = {}
         for (servo, degree) in servos:
-          self._curpos[servo.port] = servo.degree
-          self._deltas[servo.port] = delta = degree - self._curpos[servo.port]
+          port = self.portname(servo.port)
+          self._curpos[port] = servo.degree
+          self._deltas[port] = delta = degree - self._curpos[port]
           self._max_delta = max(self._max_delta, math.fabs(delta))
+      @staticmethod
+      def portname(port):
+        if port == board.V2:
+          return 'V2'
+        elif port == board.V3:
+          return 'V3'
+        elif port == board.V4:
+          return 'V4'
+        elif port == board.V5:
+          return 'V5'
+        elif port == board.V6:
+          return 'V6'
+        elif port == board.V7:
+          return 'V7'
+        elif port == board.V8:
+          return 'V8'
+        elif port == board.V9:
+          return 'V9'
+        else:
+          raise RuntimeError('port must be V2 through board.V9, but got', port)
       @property
       def delta(self):
         return self._max_delta
-      def update(port, tick):
+      def update(self, servo, tick):
+        port = self.portname(servo.port)
         return self._curpos[port] + self._deltas[port] / self._max_delta * tick
     deltas = deltas(servos)
     if deltas.delta == 0:
       pass
     else:
       def moveall(f, delay):
-        for servo in servos: f(**servo)
+        for (servo, degree) in servos: f(servo, degree)
         time.sleep(delay / 1000)
       if delay == 0:
         def set_degree(servo, degree): servo.set_degree(degree = degree)
@@ -148,7 +169,7 @@ class servo_motor:
       else:
         for tick in range(0, deltas.delta):
           def move_1tick(servo, degree):
-            servo.set_degree(degree = deltas.update(servo.port, tick))
+            servo.set_degree(degree = deltas.update(servo, tick))
           moveall(move_1tick, delay)
 
   def __init__(self, port, degree = None):
