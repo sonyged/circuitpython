@@ -190,7 +190,7 @@ class servo_motor:
 
   @property
   def degree(self):
-    if not self._degree:
+    if self._degree is None:
       self.set_degree(90)
     return self._degree
 
