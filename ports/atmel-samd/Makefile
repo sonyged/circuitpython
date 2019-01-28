@@ -135,6 +135,10 @@ CFLAGS += \
 	-mfloat-abi=soft \
 	-DSAMD21
 endif
+ifdef NO_AUDIOIO
+CFLAGS += \
+	-DNO_AUDIOIO
+endif
 ifdef NO_GAMEPAD
 CFLAGS += \
 	-DNO_GAMEPAD
@@ -263,7 +267,6 @@ endif
 SRC_ASF := $(addprefix asf4/$(CHIP_FAMILY)/, $(SRC_ASF))
 
 SRC_C = \
-	audio_dma.c \
 	board_busses.c \
 	background.c \
 	fatfs_port.c \
@@ -305,6 +308,11 @@ SRC_C = \
 	lib/mp-readline/readline.c \
 	$(BUILD)/autogen_usb_descriptor.c \
 	freetouch/adafruit_ptc.c
+
+ifndef NO_AUDIOIO
+SRC_C += \
+	audio_dma.c
+endif
 
 # Choose which flash filesystem impl to use.
 # (Right now INTERNAL_FLASH_FILESYSTEM and SPI_FLASH_FILESYSTEM are mutually exclusive.
@@ -350,9 +358,13 @@ SRC_COMMON_HAL = \
 	pulseio/PulseOut.c \
 	pulseio/PWMOut.c \
 	usb_hid/__init__.c \
-	usb_hid/Device.c \
+	usb_hid/Device.c
+
+ifndef NO_AUDIOIO
+SRC_COMMON_HAL += \
 	audioio/__init__.c \
 	audioio/AudioOut.c
+endif
 
 ifndef NO_TOUCHIO
 SRC_COMMON_HAL += \
@@ -404,8 +416,6 @@ SRC_COMMON_HAL_EXPANDED = $(addprefix shared-bindings/, $(SRC_COMMON_HAL)) \
                           $(addprefix common-hal/, $(SRC_COMMON_HAL))
 
 SRC_SHARED_MODULE = \
-	audioio/RawSample.c \
-	audioio/WaveFile.c \
 	bitbangio/__init__.c \
 	bitbangio/I2C.c \
 	bitbangio/OneWire.c \
@@ -420,6 +430,12 @@ SRC_SHARED_MODULE = \
 	struct/__init__.c \
 	uheap/__init__.c \
 	ustack/__init__.c
+
+ifndef NO_AUDIOIO
+SRC_SHARED_MODULE += \
+	audioio/RawSample.c \
+	audioio/WaveFile.c
+endif
 
 ifndef NO_GAMEPAD
 SRC_SHARED_MODULE += \
