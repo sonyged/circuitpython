@@ -26,6 +26,7 @@
 
 #include "common-hal/rotaryio/IncrementalEncoder.h"
 
+#ifndef NO_ROTARYIO
 #include "atmel_start_pins.h"
 
 #include "samd/external_interrupts.h"
@@ -155,3 +156,6 @@ void incrementalencoder_interrupt_handler(uint8_t channel) {
         self->quarter_count = 0;
     }
 }
+#else
+void incrementalencoder_interrupt_handler(uint8_t channel) {}
+#endif
