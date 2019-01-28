@@ -230,6 +230,10 @@ class light_sensor(analog_sensor):
   def __init__(self, port):
     super().__init__(port = port, scale = 100.0 / 65535)
 
+class sound_sensor(analog_sensor):
+  def __init__(self, port):
+    super().__init__(port = port, scale = 100.0 / 65535 * (3.3 - 1.5) / 3.3)
+
 class accelerometer:
   def __init__(self):
     self._i2c = busio.I2C(board.SCL, board.SDA)
