@@ -135,6 +135,10 @@ CFLAGS += \
 	-mfloat-abi=soft \
 	-DSAMD21
 endif
+ifdef NO_GAMEPAD
+CFLAGS += \
+	-DNO_GAMEPAD
+endif
 ifdef NO_TOUCHIO
 CFLAGS += \
 	-DNO_TOUCHIO
@@ -403,8 +407,6 @@ SRC_SHARED_MODULE = \
 	bitbangio/OneWire.c \
 	bitbangio/SPI.c \
 	busio/OneWire.c \
-	gamepad/__init__.c \
-	gamepad/GamePad.c \
 	_stage/__init__.c \
 	_stage/Layer.c \
 	_stage/Text.c \
@@ -414,6 +416,12 @@ SRC_SHARED_MODULE = \
 	struct/__init__.c \
 	uheap/__init__.c \
 	ustack/__init__.c
+
+ifndef NO_GAMEPAD
+SRC_SHARED_MODULE += \
+	gamepad/__init__.c \
+	gamepad/GamePad.c
+endif
 
 # The smallest SAMD51 packages don't have I2S. Everything else does.
 ifneq ($(CHIP_VARIANT),SAMD51G18A)

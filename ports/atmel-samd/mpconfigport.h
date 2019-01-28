@@ -207,13 +207,22 @@ extern const struct _mp_obj_module_t usb_hid_module;
 
     #define MICROPY_BUILTIN_METHOD_CHECK_SELF_ARG (1)
     #define MICROPY_PY_ALL_SPECIAL_METHODS (1)
+    #ifndef NO_GAMEPAD
     // Scan gamepad every 32ms
     #define CIRCUITPY_GAMEPAD_TICKS 0x1f
+    #endif
 
     #if defined(__SAMD51G19A__) || defined(__SAMD51G18A__)
         #define AUDIOBUSIO_MODULE
     #else
         #define AUDIOBUSIO_MODULE { MP_OBJ_NEW_QSTR(MP_QSTR_audiobusio), (mp_obj_t)&audiobusio_module },
+    #endif
+
+    #ifdef NO_GAMEPAD
+    #define GAMEPAD_MODULE
+    #else
+    #define GAMEPAD_MODULE \
+        { MP_OBJ_NEW_QSTR(MP_QSTR_gamepad),(mp_obj_t)&gamepad_module }
     #endif
 
     #ifndef EXTRA_BUILTIN_MODULES
@@ -222,7 +231,7 @@ extern const struct _mp_obj_module_t usb_hid_module;
         AUDIOBUSIO_MODULE \
         { MP_OBJ_NEW_QSTR(MP_QSTR_bitbangio), (mp_obj_t)&bitbangio_module }, \
         { MP_OBJ_NEW_QSTR(MP_QSTR_rotaryio), (mp_obj_t)&rotaryio_module }, \
-        { MP_OBJ_NEW_QSTR(MP_QSTR_gamepad),(mp_obj_t)&gamepad_module }
+        GAMEPAD_MODULE
     #endif
     #define EXPRESS_BOARD
 
@@ -324,13 +333,20 @@ extern const struct _mp_obj_module_t usb_hid_module;
 
 #include "peripherals/samd/dma.h"
 
+#ifdef NO_GAMEPAD
+#define GAMEPAD_ROOT_POINTERS
+#else
+#define GAMEPAD_ROOT_POINTERS \
+    mp_obj_t gamepad_singleton; 
+#endif
+
 #define MICROPY_PORT_ROOT_POINTERS \
     const char *readline_hist[8]; \
     vstr_t *repl_line; \
     mp_obj_t playing_audio[AUDIO_DMA_CHANNEL_COUNT]; \
     mp_obj_t rtc_time_source; \
     FLASH_ROOT_POINTERS \
-    mp_obj_t gamepad_singleton; \
+    GAMEPAD_ROOT_POINTERS \
 
 void run_background_tasks(void);
 #define MICROPY_VM_HOOK_LOOP run_background_tasks();
