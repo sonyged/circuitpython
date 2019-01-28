@@ -241,11 +241,15 @@ void reset_port(void) {
     }
 
 #ifdef EXPRESS_BOARD
+#ifndef NO_AUDIOIO
     audioout_reset();
+#endif
     #if !defined(__SAMD51G19A__) && !defined(__SAMD51G18A__)
     i2sout_reset();
     #endif
+#ifndef NO_AUDIOIO
     audio_dma_reset();
+#endif
     //pdmin_reset();
 #endif
 #ifdef SAMD21
