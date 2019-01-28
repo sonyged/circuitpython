@@ -139,6 +139,10 @@ ifdef NO_GAMEPAD
 CFLAGS += \
 	-DNO_GAMEPAD
 endif
+ifdef NO_ROTARYIO
+CFLAGS += \
+	-DNO_ROTARYIO
+endif
 ifdef NO_TOUCHIO
 CFLAGS += \
 	-DNO_TOUCHIO
