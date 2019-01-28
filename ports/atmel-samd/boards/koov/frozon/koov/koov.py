@@ -30,6 +30,9 @@ class led:
     self._device = digitalio.DigitalInOut(port)
     self._device.direction = digitalio.Direction.OUTPUT
 
+  def deinit(self):
+    self._device.deinit()
+
   def on(self):
     self._device.value = True
 
@@ -51,6 +54,12 @@ class multi_led:
     self._g = pulseio.PWMOut(board.D12)
     self._b = pulseio.PWMOut(board.D10)
 
+  def deinit(self):
+    self._fet.deinit()
+    self._r.deinit()
+    self._g.deinit()
+    self._b.deinit()
+
   def on(self, r, g, b):
     self._r.duty_cycle = int((100 - max(0, min(100, r))) * 0xffff / 100)
     self._g.duty_cycle = int((100 - max(0, min(100, g))) * 0xffff / 100)
@@ -69,6 +78,9 @@ class buzzer:
                                   duty_cycle = 2 ** 15,
                                   frequency = 20000,
                                   variable_frequency = True)
+
+  def deinit(self):
+    self._device.deinit()
 
   def on(self, freq):
     def frequency(x): return int(440.0 * 2 ** (((x) - 69) / 12))
@@ -90,6 +102,10 @@ class dc_motor:
     self._dpin.direction = digitalio.Direction.OUTPUT
     self._mode = 'COAST'
     self._power = 0
+
+  def deinit(self):
+    self._apin.deinit()
+    self._dpin.deinit()
 
   def _control(self):
     if self._mode == 'NORMAL':
@@ -180,6 +196,9 @@ class servo_motor:
     else:
       self._degree = None
 
+  def deinit(self):
+    self._device.deinit()
+
   def set_degree(self, degree):
     degree = max(0, min(180, degree))
     ratio = degree / 180
@@ -202,6 +221,10 @@ class digital_sensor:
   def __init__(self, port):
     self._device = digitalio.DigitalInOut(port)
     self._device.switch_to_input(pull = digitalio.Pull.UP)
+
+  def deinit(self):
+    self._device.deinit()
+
   @property
   def value(self):
     return self._device.value
@@ -218,6 +241,10 @@ class analog_sensor:
   def __init__(self, port, scale = 1.0):
     self._device = analogio.AnalogIn(port)
     self._scale = scale
+
+  def deinit(self):
+    self._device.deinit()
+
   @property
   def value(self):
     return self._device.value * self._scale
