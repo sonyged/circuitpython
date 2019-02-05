@@ -15,8 +15,10 @@ NO_AUDIOIO = 1
 NO_GAMEPAD = 1
 NO_ROTARYIO = 1
 NO_TOUCHIO = 1
+NO_USBHID = 1
 RESET_WITH_WDT = 1
 
 FROZEN_MPY_DIRS += $(TOP)/frozen/Adafruit_CircuitPython_BusDevice
 FROZEN_MPY_DIRS += $(TOP)/frozen/Adafruit_CircuitPython_MMA8451
 FROZEN_MPY_DIRS += $(TOP)/ports/atmel-samd/boards/koov/frozon/koov
+FROZEN_MPY_DIRS += $(TOP)/frozen/Adafruit_CircuitPython_NeoPixel
