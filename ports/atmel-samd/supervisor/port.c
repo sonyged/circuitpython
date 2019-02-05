@@ -53,8 +53,12 @@
 #include "common-hal/pulseio/PulseOut.h"
 #include "common-hal/pulseio/PWMOut.h"
 #include "common-hal/rtc/RTC.h"
+#ifndef NO_TOUCHIO
 #include "common-hal/touchio/TouchIn.h"
+#endif
+#ifndef NO_USBHID
 #include "common-hal/usb_hid/Device.h"
+#endif
 #include "samd/cache.h"
 #include "samd/clocks.h"
 #include "samd/events.h"
@@ -288,7 +292,9 @@ void reset_port(void) {
     // gpio_set_pin_function(PIN_PB15, GPIO_PIN_FUNCTION_M); // GCLK1, D6
     // #endif
 
+#ifndef NO_USBHID
     usb_hid_reset();
+#endif
 
     if (usb_connected()) {
         save_usb_clock_calibration();

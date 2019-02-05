@@ -151,6 +151,10 @@ ifdef NO_TOUCHIO
 CFLAGS += \
 	-DNO_TOUCHIO
 endif
+ifdef NO_USBHID
+CFLAGS += \
+	-DNO_USBHID
+endif
 ifdef RESET_WITH_WDT
 CFLAGS += \
 	-DRESET_WITH_WDT
@@ -356,9 +360,7 @@ SRC_COMMON_HAL = \
 	pulseio/__init__.c \
 	pulseio/PulseIn.c \
 	pulseio/PulseOut.c \
-	pulseio/PWMOut.c \
-	usb_hid/__init__.c \
-	usb_hid/Device.c
+	pulseio/PWMOut.c
 
 ifndef NO_AUDIOIO
 SRC_COMMON_HAL += \
@@ -369,10 +371,14 @@ endif
 ifndef NO_TOUCHIO
 SRC_COMMON_HAL += \
 	touchio/__init__.c \
-	touchio/TouchIn.c \
-
+	touchio/TouchIn.c
 endif
 
+ifndef NO_USBHID
+SRC_COMMON_HAL += \
+	usb_hid/__init__.c \
+	usb_hid/Device.c
+endif
 
 ifeq ($(INTERNAL_LIBM),1)
 SRC_LIBM = $(addprefix lib/,\

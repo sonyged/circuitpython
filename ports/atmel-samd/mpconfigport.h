@@ -185,10 +185,16 @@ extern const struct _mp_obj_module_t neopixel_write_module;
 extern const struct _mp_obj_module_t uheap_module;
 extern const struct _mp_obj_module_t ustack_module;
 extern const struct _mp_obj_module_t supervisor_module;
+#ifndef NO_GAMEPAD
 extern const struct _mp_obj_module_t gamepad_module;
+#endif
 extern const struct _mp_obj_module_t stage_module;
+#ifndef NO_TOUCHIO
 extern const struct _mp_obj_module_t touchio_module;
+#endif
+#ifndef NO_USBHID
 extern const struct _mp_obj_module_t usb_hid_module;
+#endif
 
 // Internal flash size dependent settings.
 #if BOARD_FLASH_SIZE > 192000
@@ -262,6 +268,12 @@ extern const struct _mp_obj_module_t usb_hid_module;
 #define TOUCHIO_MODULE
 #endif
 
+#ifndef NO_USBHID
+#define USBHID_MODULE { MP_OBJ_NEW_QSTR(MP_QSTR_usb_hid),(mp_obj_t)&usb_hid_module },
+#else
+#define USBHID_MODULE
+#endif
+
 // A pIRKey has minimal I/O needs. Remove unneeded modules to make room
 // for frozen modules. math is very large and is also removed.
 #ifdef PIRKEY_M0
@@ -277,7 +289,7 @@ extern const struct _mp_obj_module_t usb_hid_module;
     { MP_OBJ_NEW_QSTR(MP_QSTR_struct), (mp_obj_t)&struct_module }, \
     { MP_OBJ_NEW_QSTR(MP_QSTR_supervisor), (mp_obj_t)&supervisor_module }, \
     { MP_OBJ_NEW_QSTR(MP_QSTR_time), (mp_obj_t)&time_module }, \
-    { MP_OBJ_NEW_QSTR(MP_QSTR_usb_hid),(mp_obj_t)&usb_hid_module },
+    USBHID_MODULE
 #else
 #define MICROPY_PORT_BUILTIN_MODULES \
     { MP_OBJ_NEW_QSTR(MP_QSTR_analogio), (mp_obj_t)&analogio_module }, \
@@ -296,7 +308,7 @@ extern const struct _mp_obj_module_t usb_hid_module;
     { MP_OBJ_NEW_QSTR(MP_QSTR_supervisor), (mp_obj_t)&supervisor_module }, \
     { MP_OBJ_NEW_QSTR(MP_QSTR_math), (mp_obj_t)&math_module }, \
     { MP_OBJ_NEW_QSTR(MP_QSTR_time), (mp_obj_t)&time_module }, \
-    { MP_OBJ_NEW_QSTR(MP_QSTR_usb_hid),(mp_obj_t)&usb_hid_module }, \
+    USBHID_MODULE \
     TOUCHIO_MODULE \
     EXTRA_BUILTIN_MODULES
 #endif
