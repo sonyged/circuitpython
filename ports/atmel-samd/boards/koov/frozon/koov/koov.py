@@ -9,6 +9,51 @@ import random
 import math
 import busio
 import adafruit_mma8451
+from micropython import const
+
+V0 = const(0)
+V1 = const(1)
+V2 = const(2)
+V3 = const(3)
+V4 = const(4)
+V5 = const(5)
+V6 = const(6)
+V7 = const(7)
+V8 = const(8)
+V9 = const(9)
+K0 = const(10)
+K1 = const(11)
+K2 = const(12)
+K3 = const(13)
+K4 = const(14)
+K5 = const(15)
+K6 = const(16)
+K7 = const(17)
+RGB = const(18)
+UP = K2
+RIGHT = K3
+DOWN = K4
+LEFT = K5
+
+PORT2PIN = {
+  K2: board.A0,
+  K3: board.A1,
+  K4: board.A2,
+  K5: board.A3,
+  K6: board.A4,
+  K7: board.A5,
+  V2: board.D4,
+  V3: board.D3,
+  V4: board.D6,
+  V5: board.D7,
+  V6: board.D8,
+  V7: board.D9,
+  V8: board.D11,
+  V9: board.D13
+}
+
+def port2pin(port):
+  return PORT2PIN[port]
 
 TIMER_EPOCH = time.monotonic()
 
@@ -27,7 +72,7 @@ def pick_random(x, y):
 
 class led:
   def __init__(self, port):
-    self._device = digitalio.DigitalInOut(port)
+    self._device = digitalio.DigitalInOut(port2pin(port))
     self._device.direction = digitalio.Direction.OUTPUT
 
   def deinit(self):
@@ -74,7 +119,7 @@ class multi_led:
 
 class buzzer:
   def __init__(self, port):
-    self._device = pulseio.PWMOut(port,
+    self._device = pulseio.PWMOut(port2pin(port),
                                   duty_cycle = 2 ** 15,
                                   frequency = 20000,
                                   variable_frequency = True)
@@ -142,35 +187,15 @@ class servo_motor:
         self._curpos = {}
         self._deltas = {}
         for (servo, degree) in servos:
-          port = self.portname(servo.port)
+          port = servo.port
           self._curpos[port] = servo.degree
           self._deltas[port] = delta = degree - self._curpos[port]
           self._max_delta = max(self._max_delta, math.fabs(delta))
-      @staticmethod
-      def portname(port):
-        if port == board.V2:
-          return 'V2'
-        elif port == board.V3:
-          return 'V3'
-        elif port == board.V4:
-          return 'V4'
-        elif port == board.V5:
-          return 'V5'
-        elif port == board.V6:
-          return 'V6'
-        elif port == board.V7:
-          return 'V7'
-        elif port == board.V8:
-          return 'V8'
-        elif port == board.V9:
-          return 'V9'
-        else:
-          raise RuntimeError('port must be V2 through board.V9, but got', port)
       @property
       def delta(self):
         return self._max_delta
       def update(self, servo, tick):
-        port = self.portname(servo.port)
+        port = servo.port
         return self._curpos[port] + self._deltas[port] / self._max_delta * tick
     deltas = deltas(servos)
     if deltas.delta == 0:
@@ -190,7 +215,8 @@ class servo_motor:
 
   def __init__(self, port, degree = None):
     self._port = port
-    self._device = pulseio.PWMOut(port, duty_cycle = 2 ** 15, frequency = 50)
+    self._device = pulseio.PWMOut(
+      port2pin(self._port), duty_cycle = 2 ** 15, frequency = 50)
     if degree:
       self.set_degree(degree)
     else:
@@ -219,7 +245,7 @@ class servo_motor:
 
 class digital_sensor:
   def __init__(self, port):
-    self._device = digitalio.DigitalInOut(port)
+    self._device = digitalio.DigitalInOut(port2pin(port))
     self._device.switch_to_input(pull = digitalio.Pull.UP)
 
   def deinit(self):
@@ -239,7 +265,7 @@ class touch_sensor(digital_sensor):
 
 class analog_sensor:
   def __init__(self, port, scale = 1.0):
-    self._device = analogio.AnalogIn(port)
+    self._device = analogio.AnalogIn(port2pin(port))
     self._scale = scale
 
   def deinit(self):
