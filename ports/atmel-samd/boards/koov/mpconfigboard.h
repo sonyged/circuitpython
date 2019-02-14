@@ -11,7 +11,7 @@
 #define MICROPY_PORT_B        (PORT_PB03)
 #define MICROPY_PORT_C        (0)
 
-#define TOTAL_INTERNAL_FLASH_SIZE 0x009000
+#define TOTAL_INTERNAL_FLASH_SIZE 0x008000
 
 #include "internal_flash.h"
 
