@@ -55,6 +55,15 @@ PORT2PIN = {
 def port2pin(port):
   return PORT2PIN[port]
 
+DEVICES = []
+
+def finalize():
+  while len(DEVICES) > 0:
+    DEVICES.pop().deinit()
+
+def devices():
+  return DEVICES
+
 TIMER_EPOCH = time.monotonic()
 
 def reset_timer():
@@ -74,6 +83,7 @@ class led:
   def __init__(self, port):
     self._device = digitalio.DigitalInOut(port2pin(port))
     self._device.direction = digitalio.Direction.OUTPUT
+    DEVICES.append(self)
 
   def deinit(self):
     self._device.deinit()
@@ -98,6 +108,7 @@ class multi_led:
     self._r = pulseio.PWMOut(board.D13)
     self._g = pulseio.PWMOut(board.D12)
     self._b = pulseio.PWMOut(board.D10)
+    DEVICES.append(self)
 
   def deinit(self):
     self._fet.deinit()
@@ -119,10 +130,12 @@ class multi_led:
 
 class buzzer:
   def __init__(self, port):
-    self._device = pulseio.PWMOut(port2pin(port),
-                                  duty_cycle = 2 ** 15,
-                                  frequency = 20000,
-                                  variable_frequency = True)
+    self._device = pulseio.PWMOut(
+      port2pin(port),
+      duty_cycle = 2 ** 15,
+      frequency = 20000,
+      variable_frequency = True)
+    DEVICES.append(self)
 
   def deinit(self):
     self._device.deinit()
@@ -147,6 +160,7 @@ class dc_motor:
     self._dpin.direction = digitalio.Direction.OUTPUT
     self._mode = 'COAST'
     self._power = 0
+    DEVICES.append(self)
 
   def deinit(self):
     self._apin.deinit()
@@ -221,6 +235,7 @@ class servo_motor:
       self.set_degree(degree)
     else:
       self._degree = None
+    DEVICES.append(self)
 
   def deinit(self):
     self._device.deinit()
@@ -247,6 +262,7 @@ class digital_sensor:
   def __init__(self, port):
     self._device = digitalio.DigitalInOut(port2pin(port))
     self._device.switch_to_input(pull = digitalio.Pull.UP)
+    DEVICES.append(self)
 
   def deinit(self):
     self._device.deinit()
@@ -267,6 +283,7 @@ class analog_sensor:
   def __init__(self, port, scale = 1.0):
     self._device = analogio.AnalogIn(port2pin(port))
     self._scale = scale
+    DEVICES.append(self)
 
   def deinit(self):
     self._device.deinit()
@@ -291,6 +308,10 @@ class accelerometer:
   def __init__(self):
     self._i2c = busio.I2C(board.SCL, board.SDA)
     self._device = adafruit_mma8451.MMA8451(self._i2c)
+    DEVICES.append(self)
+
+  def deinit(self):
+    self._i2c.deinit()
 
   @property
   def value(self):
