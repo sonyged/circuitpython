@@ -61,6 +61,12 @@ def finalize():
   while len(DEVICES) > 0:
     DEVICES.pop().deinit()
 
+def execute(main):
+  try:
+    main()
+  finally:
+    finalize()
+
 def devices():
   return DEVICES
 
