@@ -107,7 +107,9 @@ class led:
       self._device.value = False
 
 class multi_led:
-  def __init__(self):
+  def __init__(self, port):
+    if port is not RGB:
+      raise RuntimeError('port must be koov.RGB, but got', port)
     self._fet = digitalio.DigitalInOut(board.MISO)
     self._fet.direction = digitalio.Direction.OUTPUT
     self._fet.value = True
@@ -162,7 +164,7 @@ class dc_motor:
       self._apin = pulseio.PWMOut(board.D10)
       self._dpin = digitalio.DigitalInOut(board.D12)
     else:
-      raise RuntimeError('port must be board.V0 or board.V1, but got', port)
+      raise RuntimeError('port must be koov.V0 or koov.V1, but got', port)
     self._dpin.direction = digitalio.Direction.OUTPUT
     self._mode = 'COAST'
     self._power = 0
@@ -311,7 +313,9 @@ class sound_sensor(analog_sensor):
     super().__init__(port = port, scale = 100.0 / 65535 * (3.3 - 1.5) / 3.3)
 
 class accelerometer:
-  def __init__(self):
+  def __init__(self, port):
+    if port not in [ K0, K1 ]:
+      raise RuntimeError('port must be koov.K0 or koov.K1, but got', port)
     self._i2c = busio.I2C(board.SCL, board.SDA)
     self._device = adafruit_mma8451.MMA8451(self._i2c)
     DEVICES.append(self)
