@@ -35,6 +35,13 @@ RIGHT = K3
 DOWN = K4
 LEFT = K5
 
+ON = 'ON'
+OFF = 'OFF'
+NORMAL = 'NORMAL'
+REVERSE = 'REVERSE'
+COAST = 'COAST'
+BRAKE = 'BRAKE'
+
 PORT2PIN = {
   K2: board.A0,
   K3: board.A1,
@@ -101,7 +108,7 @@ class led:
     self._device.value = False
 
   def set_mode(self, mode):
-    if mode == 'ON':
+    if mode == ON:
       self._device.value = True
     else:
       self._device.value = False
@@ -157,16 +164,16 @@ class buzzer:
 
 class dc_motor:
   def __init__(self, port):
-    if port == board.V0:
+    if port == V0:
       self._apin = pulseio.PWMOut(board.D2)
       self._dpin = digitalio.DigitalInOut(board.D5)
-    elif port == board.V1:
+    elif port == V1:
       self._apin = pulseio.PWMOut(board.D10)
       self._dpin = digitalio.DigitalInOut(board.D12)
     else:
       raise RuntimeError('port must be koov.V0 or koov.V1, but got', port)
     self._dpin.direction = digitalio.Direction.OUTPUT
-    self._mode = 'COAST'
+    self._mode = COAST
     self._power = 0
     DEVICES.append(self)
 
@@ -175,16 +182,16 @@ class dc_motor:
     self._dpin.deinit()
 
   def _control(self):
-    if self._mode == 'NORMAL':
+    if self._mode == NORMAL:
       self._dpin.value = False
       self._apin.duty_cycle = int(self._power * 0xffff / 100)
-    elif self._mode == 'REVERSE':
+    elif self._mode == REVERSE:
       self._dpin.value = True
       self._apin.duty_cycle = int((100 - self._power) * 0xffff / 100)
-    elif self._mode == 'COAST':
+    elif self._mode == COAST:
       self._dpin.value = False
       self._apin.duty_cycle = 0
-    elif self._mode == 'BRAKE':
+    elif self._mode == BRAKE:
       self._dpin.value = True
       self._apin.duty_cycle = 0xffff
     else:
