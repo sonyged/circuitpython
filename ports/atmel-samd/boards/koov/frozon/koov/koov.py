@@ -62,6 +62,9 @@ PORT2PIN = {
 def port2pin(port):
   return PORT2PIN[port]
 
+def clamp(x, y, v):
+  return max(x, min(y, v))
+
 DEVICES = []
 
 def finalize():
@@ -132,9 +135,9 @@ class multi_led:
     self._b.deinit()
 
   def on(self, r, g, b):
-    self._r.duty_cycle = int((100 - max(0, min(100, r))) * 0xffff / 100)
-    self._g.duty_cycle = int((100 - max(0, min(100, g))) * 0xffff / 100)
-    self._b.duty_cycle = int((100 - max(0, min(100, b))) * 0xffff / 100)
+    self._r.duty_cycle = int((100 - clamp(0, 100, r)) * 0xffff / 100)
+    self._g.duty_cycle = int((100 - clamp(0, 100, g)) * 0xffff / 100)
+    self._b.duty_cycle = int((100 - clamp(0, 100, b)) * 0xffff / 100)
     self._fet.value = False
 
   def off(self):
@@ -163,7 +166,7 @@ class buzzer:
     self._device.frequency = 20000
 
 class dc_motor:
-  def __init__(self, port):
+  def __init__(self, port, scale = None):
     if port == V0:
       self._apin = pulseio.PWMOut(board.D2)
       self._dpin = digitalio.DigitalInOut(board.D5)
@@ -173,6 +176,7 @@ class dc_motor:
     else:
       raise RuntimeError('port must be koov.V0 or koov.V1, but got', port)
     self._dpin.direction = digitalio.Direction.OUTPUT
+    self._scale = scale if scale is not None else 1
     self._mode = COAST
     self._power = 0
     DEVICES.append(self)
@@ -182,12 +186,13 @@ class dc_motor:
     self._dpin.deinit()
 
   def _control(self):
+    power = clamp(0, 100, self._power * self._scale)
     if self._mode == NORMAL:
       self._dpin.value = False
-      self._apin.duty_cycle = int(self._power * 0xffff / 100)
+      self._apin.duty_cycle = int(power * 0xffff / 100)
     elif self._mode == REVERSE:
       self._dpin.value = True
-      self._apin.duty_cycle = int((100 - self._power) * 0xffff / 100)
+      self._apin.duty_cycle = int((100 - power) * 0xffff / 100)
     elif self._mode == COAST:
       self._dpin.value = False
       self._apin.duty_cycle = 0
@@ -198,7 +203,7 @@ class dc_motor:
       raise RuntimeError('unknown mode', self._mode)
 
   def set_power(self, power):
-    self._power = max(0, min(100, power))
+    self._power = clamp(0, 100, power)
     self._control()
 
   def set_mode(self, mode):
@@ -208,8 +213,8 @@ class dc_motor:
 class servo_motor:
   @staticmethod
   def synchronized_motion(speed, servos):
-    speed = max(0, min(100, speed)) / 5
-    delay = 20 - max(0, min(20, speed))
+    speed = clamp(0, 100, speed) / 5
+    delay = 20 - clamp(0, 20, speed)
     class deltas:
       def __init__(self, servos):
         self._max_delta = 0
@@ -242,11 +247,12 @@ class servo_motor:
             servo.set_degree(degree = deltas.update(servo, tick))
           moveall(move_1tick, delay)
 
-  def __init__(self, port, degree = None):
+  def __init__(self, port, degree = None, drift = None):
     self._port = port
+    self._drift = drift if drift is not None else 0
     self._device = pulseio.PWMOut(
       port2pin(self._port), duty_cycle = 2 ** 15, frequency = 50)
-    if degree:
+    if degree is not None:
       self.set_degree(degree)
     else:
       self._degree = None
@@ -256,9 +262,9 @@ class servo_motor:
     self._device.deinit()
 
   def set_degree(self, degree):
-    degree = max(0, min(180, degree))
+    self._degree = clamp(0, 180, degree)
+    degree = clamp(0, 180, degree + self._drift)
     ratio = degree / 180
-    self._degree = degree
     min_duty = (500 * self._device.frequency) / 1000000 * 0xffff
     max_duty = (2500 * self._device.frequency) / 1000000 * 0xffff
     self._device.duty_cycle = int(min_duty + (max_duty - min_duty) * ratio)
