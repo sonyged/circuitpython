@@ -176,7 +176,7 @@ class dc_motor:
     else:
       raise RuntimeError('port must be koov.V0 or koov.V1, but got', port)
     self._dpin.direction = digitalio.Direction.OUTPUT
-    self._scale = scale if scale is not None else 1
+    self._scale = clamp(0, 1, scale) if scale is not None else 1
     self._mode = COAST
     self._power = 0
     DEVICES.append(self)
