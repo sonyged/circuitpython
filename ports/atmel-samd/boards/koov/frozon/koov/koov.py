@@ -35,13 +35,6 @@ RIGHT = K3
 DOWN = K4
 LEFT = K5
 
-ON = 'ON'
-OFF = 'OFF'
-NORMAL = 'NORMAL'
-REVERSE = 'REVERSE'
-COAST = 'COAST'
-BRAKE = 'BRAKE'
-
 PORT2PIN = {
   K2: board.A0,
   K3: board.A1,
@@ -96,6 +89,9 @@ def pick_random(x, y):
   return random.randint(math.trunc(x), math.trunc(y))
 
 class led:
+  ON = 'ON'
+  OFF = 'OFF'
+
   def __init__(self, port):
     self._device = digitalio.DigitalInOut(port2pin(port))
     self._device.direction = digitalio.Direction.OUTPUT
@@ -111,7 +107,7 @@ class led:
     self._device.value = False
 
   def set_mode(self, mode):
-    if mode == ON:
+    if mode == self.ON:
       self._device.value = True
     else:
       self._device.value = False
@@ -166,6 +162,11 @@ class buzzer:
     self._device.frequency = 20000
 
 class dc_motor:
+  NORMAL = 'NORMAL'
+  REVERSE = 'REVERSE'
+  COAST = 'COAST'
+  BRAKE = 'BRAKE'
+
   def __init__(self, port, scale = None):
     if port == V0:
       self._apin = pulseio.PWMOut(board.D2)
@@ -177,7 +178,7 @@ class dc_motor:
       raise RuntimeError('port must be koov.V0 or koov.V1, but got', port)
     self._dpin.direction = digitalio.Direction.OUTPUT
     self._scale = clamp(0, 1, scale) if scale is not None else 1
-    self._mode = COAST
+    self._mode = self.COAST
     self._power = 0
     DEVICES.append(self)
 
@@ -187,16 +188,16 @@ class dc_motor:
 
   def _control(self):
     power = clamp(0, 100, self._power * self._scale)
-    if self._mode == NORMAL:
+    if self._mode == self.NORMAL:
       self._dpin.value = False
       self._apin.duty_cycle = int(power * 0xffff / 100)
-    elif self._mode == REVERSE:
+    elif self._mode == self.REVERSE:
       self._dpin.value = True
       self._apin.duty_cycle = int((100 - power) * 0xffff / 100)
-    elif self._mode == COAST:
+    elif self._mode == self.COAST:
       self._dpin.value = False
       self._apin.duty_cycle = 0
-    elif self._mode == BRAKE:
+    elif self._mode == self.BRAKE:
       self._dpin.value = True
       self._apin.duty_cycle = 0xffff
     else:
@@ -209,6 +210,18 @@ class dc_motor:
   def set_mode(self, mode):
     self._mode = mode
     self._control()
+
+  def start_normal(self):
+    self.set_mode(self.NORMAL)
+
+  def start_reverse(self):
+    self.set_mode(self.REVERSE)
+
+  def stop_coast(self):
+    self.set_mode(self.COAST)
+
+  def stop_brake(self):
+    self.set_mode(self.BRAKE)
 
 class servo_motor:
   @staticmethod
@@ -292,6 +305,10 @@ class digital_sensor:
   def value(self):
     return self._device.value
 
+  @property
+  def pressed(self):
+    return self.value is 0
+
 class push_button(digital_sensor):
   def __init__(self, port):
     super().__init__(port)
@@ -325,10 +342,13 @@ class sound_sensor(analog_sensor):
   def __init__(self, port):
     super().__init__(port = port, scale = 100.0 / 65535 * (3.3 - 1.5) / 3.3)
 
+def ensure_i2c(port):
+  if port not in [ K0, K1 ]:
+    raise RuntimeError('port must be koov.K0 or koov.K1, but got', port)
+
 class accelerometer:
   def __init__(self, port):
-    if port not in [ K0, K1 ]:
-      raise RuntimeError('port must be koov.K0 or koov.K1, but got', port)
+    ensure_i2c(port)
     self._i2c = busio.I2C(board.SCL, board.SDA)
     self._device = adafruit_mma8451.MMA8451(self._i2c)
     DEVICES.append(self)
@@ -354,3 +374,48 @@ class accelerometer:
   def z(self):
     x, y, z = self._device.acceleration
     return z
+
+class image:
+  GRB = 'grb'
+
+  def __init__(self, height, width, format, pixels):
+    raise RuntimeError('image is not implemented')
+
+class led_matrix:
+  def __init__(self, port):
+    raise RuntimeError('led-matrix is not implemented')
+
+  def show(self, image, x, y, brightness):
+    raise RuntimeError('led-matrix is not implemented')
+
+class ultrasonic_distance_sensor:
+  def __init__(self, port):
+    raise RuntimeError('ultrasonic distance sensor is not implemented')
+
+  @property
+  def value(self):
+    raise RuntimeError('ultrasonic distance sensor is not implemented')
+
+class color_sensor:
+  def __init__(self, port):
+    ensure_i2c(port)
+    raise RuntimeError('color sensor is not implemented')
+
+  def deinit(self):
+    raise RuntimeError('color sensor is not implemented')
+
+  @property
+  def value(self):
+    raise RuntimeError('color sensor is not implemented')
+
+  @property
+  def r(self):
+    raise RuntimeError('color sensor is not implemented')
+
+  @property
+  def g(self):
+    raise RuntimeError('color sensor is not implemented')
+
+  @property
+  def b(self):
+    raise RuntimeError('color sensor is not implemented')
