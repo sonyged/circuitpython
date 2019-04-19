@@ -107,7 +107,7 @@ class led:
     self._device.value = False
 
   def set_mode(self, mode):
-    if mode == self.ON:
+    if mode == led.ON:
       self._device.value = True
     else:
       self._device.value = False
@@ -178,7 +178,7 @@ class dc_motor:
       raise RuntimeError('port must be koov.V0 or koov.V1, but got', port)
     self._dpin.direction = digitalio.Direction.OUTPUT
     self._scale = clamp(0, 1, scale) if scale is not None else 1
-    self._mode = self.COAST
+    self._mode = dc_motor.COAST
     self._power = 0
     DEVICES.append(self)
 
@@ -188,16 +188,16 @@ class dc_motor:
 
   def _control(self):
     power = clamp(0, 100, self._power * self._scale)
-    if self._mode == self.NORMAL:
+    if self._mode == dc_motor.NORMAL:
       self._dpin.value = False
       self._apin.duty_cycle = int(power * 0xffff / 100)
-    elif self._mode == self.REVERSE:
+    elif self._mode == dc_motor.REVERSE:
       self._dpin.value = True
       self._apin.duty_cycle = int((100 - power) * 0xffff / 100)
-    elif self._mode == self.COAST:
+    elif self._mode == dc_motor.COAST:
       self._dpin.value = False
       self._apin.duty_cycle = 0
-    elif self._mode == self.BRAKE:
+    elif self._mode == dc_motor.BRAKE:
       self._dpin.value = True
       self._apin.duty_cycle = 0xffff
     else:
@@ -212,16 +212,16 @@ class dc_motor:
     self._control()
 
   def start_normal(self):
-    self.set_mode(self.NORMAL)
+    self.set_mode(dc_motor.NORMAL)
 
   def start_reverse(self):
-    self.set_mode(self.REVERSE)
+    self.set_mode(dc_motor.REVERSE)
 
   def stop_coast(self):
-    self.set_mode(self.COAST)
+    self.set_mode(dc_motor.COAST)
 
   def stop_brake(self):
-    self.set_mode(self.BRAKE)
+    self.set_mode(dc_motor.BRAKE)
 
 class servo_motor:
   @staticmethod
