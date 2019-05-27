@@ -312,10 +312,12 @@ class digital_sensor:
 class push_button(digital_sensor):
   def __init__(self, port):
     super().__init__(port)
+core_button = push_button
 
 class touch_sensor(digital_sensor):
   def __init__(self, port):
     super().__init__(port)
+push_switch = touch_sensor
 
 class analog_sensor:
   def __init__(self, port, scale = 1.0):
@@ -387,6 +389,7 @@ class led_matrix:
 
   def show(self, image, x, y, brightness):
     raise RuntimeError('led-matrix is not implemented')
+multicolor_matrix = led_matrix
 
 class ultrasonic_distance_sensor:
   def __init__(self, port):
