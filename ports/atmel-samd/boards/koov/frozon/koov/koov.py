@@ -167,7 +167,7 @@ class dc_motor:
   COAST = 'COAST'
   BRAKE = 'BRAKE'
 
-  def __init__(self, port, scale = None):
+  def __init__(self, port, scale = 1):
     if port == V0:
       self._apin = pulseio.PWMOut(board.D2)
       self._dpin = digitalio.DigitalInOut(board.D5)
@@ -260,7 +260,7 @@ class servo_motor:
             servo.set_degree(degree = deltas.update(servo, tick))
           moveall(move_1tick, delay)
 
-  def __init__(self, port, degree = None, drift = None):
+  def __init__(self, port, degree = 90, drift = 0):
     self._port = port
     self._drift = drift if drift is not None else 0
     self._device = pulseio.PWMOut(
